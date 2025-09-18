@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Generator</title>
+
+ 
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #eceff1, #ffffff);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      color: #000000;
+      margin-bottom: 15px;
+    }
+
+    form {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      max-width: 550px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+
+    form input, form textarea, form button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    form button {
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    form button:hover {
+      background: #34495e;
+    }
+
+    .certificate {
+      background: #fff;
+      border: 14px double #d4af37; 
+      padding: 50px;
+      max-width: 950px;
+      width: 100%;
+      box-shadow: 0 0 35px rgba(0,0,0,0.25);
+      text-align: center;
+      margin-bottom: 50px;
+      display: none;
+      position: relative;
+    }
+
+    .certificate h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .divider {
+      width: 150px;
+      height: 5px;
+      background: #d4af37; 
+      margin: 25px auto;
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: "✦";
+      position: absolute;
+      top: -12px;
+      font-size: 1.2rem;
+      color: #d4af37;
+    }
+
+    .divider::before { left: -25px; }
+    .divider::after { right: -25px; }
+
+    .recipient {
+      font-size: 2rem;
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 25px 0;
+    }
+
+    .certificate p {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      color: #2c3e50;
+    }
+
+    .event {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #34495e;
+    }
+
+    .issuer {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .issue-date {
+      margin-top: 35px;
+      font-style: italic;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .download-btn {
+      margin-top: 20px;
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      padding: 10px 25px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .download-btn:hover {
+      background: #34495e;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* Responsive */
+    @media (max-width: 850px) {
+      .certificate {
+        padding: 25px;
+      }
+
+      .certificate h1 {
+        font-size: 2rem;
+      }
+
+      .recipient {
+        font-size: 1.5rem;
+      }
+
+      .divider {
+        width: 100px;
+        height: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Certificate Generator</h2>
+  <form id="certificateForm">
+    <input type="text" id="teamName" placeholder="Enter Team Name" required>
+    <input type="text" id="teamLead" placeholder="Enter Team Lead Name" required>
+    <input type="text" id="hackathonName" placeholder="Enter Hackathon Name" required>
+    <input type="text" id="organizerName" placeholder="Enter Organizer Name" required>
+    <input type="text" id="reason" placeholder="Enter Reason (e.g., For securing 4th Place)" required>
+    <input type="date" id="issueDate" required>
+    <textarea id="members" placeholder="Enter Team Members (comma separated)" required></textarea>
+    <button type="submit">Generate Certificates</button>
+  </form>
+
+  <div id="certificatesContainer"></div>
+
+  <footer>
+    Designed by <strong>Bader Ahmed</strong>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const form = document.getElementById("certificateForm");
+    const container = document.getElementById("certificatesContainer");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      container.innerHTML = ""; 
+
+      const teamName = document.getElementById("teamName").value;
+      const teamLead = document.getElementById("teamLead").value;
+      const hackathon = document.getElementById("hackathonName").value;
+      const organizer = document.getElementById("organizerName").value;
+      const reason = document.getElementById("reason").value;
+      const issueDate = document.getElementById("issueDate").value;
+      const members = document.getElementById("members").value.split(",");
+
+      members.forEach(member => {
+        const name = member.trim();
+        if (name) {
+          const cert = document.createElement("div");
+          cert.classList.add("certificate");
+          cert.innerHTML = `
+            <h1>Certificate of Achievement</h1>
+            <div class="divider"></div>
+            <p>This certificate is proudly presented to</p>
+            <div class="recipient">${name}</div>
+            <p>${reason}</p>
+            <p class="event">at the ${hackathon}</p>
+            <p>Team: ${teamName} (Team Lead: ${teamLead})</p>
+            <p class="issuer">Organized by ${organizer}</p>
+            <p class="issue-date">Issued on ${issueDate}</p>
+            <button class="download-btn">Download Certificate</button>
+          `;
+          container.appendChild(cert);
+
+          const btn = cert.querySelector(".download-btn");
+          btn.addEventListener("click", () => {
+            btn.style.display = "none"; 
+            html2canvas(cert).then(canvas => {
+              const link = document.createElement("a");
+              link.download = `${name}_Certificate.png`;
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+              btn.style.display = "block"; 
+            });
+          });
+
+          cert.style.display = "block";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
